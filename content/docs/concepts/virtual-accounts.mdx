@@ -1,0 +1,38 @@
+---
+title: Virtual Accounts
+description: What NUBANs are, and why they matter for Nigerian fintech products.
+---
+
+A NUBAN (Nigerian Uniform Bank Account Number) is a real, 10-digit bank account number — not a synthetic reference. When Meroe provisions one for a customer through Nomba, that account can receive standard bank transfers from any Nigerian bank, exactly like a normal account.
+
+## Why "virtual"
+
+It's called virtual because it's issued programmatically and dedicated to a single end customer of yours, rather than being a shared pool account your business manually reconciles. Each customer gets their own NUBAN, so an inbound transfer is unambiguous about its destination from the bank's perspective — the ambiguity Meroe resolves is about the *sender's intent*, which is what [reconciliation](/docs/concepts/reconciliation) handles.
+
+## What's tied to an account
+
+<ResponseField name="accountNumber" type="string" required>
+  The 10-digit NUBAN issued by Nomba.
+</ResponseField>
+<ResponseField name="customerId" type="string" required>
+  The Meroe customer identity this account is permanently bound to.
+</ResponseField>
+<ResponseField name="status" type="enum" required>
+  `ACTIVE`, `SUSPENDED`, or `CLOSED`. See [Account Lifecycle](/docs/guides/lifecycle) for transitions.
+</ResponseField>
+<ResponseField name="kycTier" type="enum" required>
+  Determines transaction limits enforced via balance monitors. See [KYC Tiers](/docs/concepts/kyc-tiers).
+</ResponseField>
+
+## One account, one identity, forever
+
+Unlike a raw Nomba account, a Meroe account stays bound to the same customer identity even through a rename — see the `account_events` audit trail on [renames](/docs/api-reference) — and through KYC tier upgrades. The account number itself doesn't change; what changes is the metadata and limits attached to it.
+
+<CardGroup cols={2}>
+  <Card title="Account Lifecycle" href="/docs/guides/lifecycle">
+    Suspension, closure, and the grace period before funds are released.
+  </Card>
+  <Card title="KYC Tiers" href="/docs/concepts/kyc-tiers">
+    What changes when a customer upgrades tiers.
+  </Card>
+</CardGroup>

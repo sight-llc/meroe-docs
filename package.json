@@ -1,0 +1,50 @@
+{
+  "name": "meroe-docs",
+  "version": "1.0.0",
+  "description": "Meroe developer documentation \u2014 built with Unmint (Next.js + Fumadocs)",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "gen-api": "node scripts/gen-api-docs.mjs",
+    "clean-api": "node -e \"const fs=require('fs'),p=require('path'),d='content/docs/api-reference';fs.readdirSync(d).filter(f=>f!=='index.mdx').forEach(f=>fs.rmSync(p.join(d,f),{recursive:true,force:true}));try{fs.rmSync('public/api-spec.json')}catch{}console.log('cleaned api-reference/ and public/api-spec.json')\"",
+    "clean-api:gen": "npm run clean-api && npm run gen-api",
+    "predev": "npm run gen-api || echo 'Skipping API gen (OPENAPI_SPEC_URL not set or unreachable) \u2014 using existing api-reference pages'",
+    "prebuild": "npm run gen-api || echo 'Skipping API gen (OPENAPI_SPEC_URL not set or unreachable) \u2014 using existing api-reference pages'"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "fumadocs-core": "^16.4.7",
+    "fumadocs-mdx": "^14.2.5",
+    "lucide-react": "^0.483.0",
+    "next": "^16.0.0",
+    "next-themes": "^0.4.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.0.0",
+    "@types/mdx": "^2.0.13",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9",
+    "eslint-config-next": "^16.0.0",
+    "happy-dom": "^20.3.4",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^3.1.4"
+  }
+}

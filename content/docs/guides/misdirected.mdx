@@ -1,0 +1,53 @@
+---
+title: Misdirected Payments
+description: Detection logic and the resolution flow for payments that don't reconcile cleanly.
+---
+
+A misdirected payment is money that landed in a customer's NUBAN but failed one of the [reconciliation](/docs/concepts/reconciliation) checks — most commonly, the sender's name doesn't match the account holder, which usually means the sender mistyped an account number on their own bank's app and the money landed somewhere unintended.
+
+## Detecting it
+
+No action is required to detect a misdirected payment — every inbound transfer runs through the same matching pipeline. When it fails, the payment is marked `UNMATCHED` and the funds are posted to `@suspense/NGN` rather than the customer's balance, so they're never silently credited to the wrong person.
+
+```bash
+curl https://api.meroe.dev/v1/reconciliation/unmatched \
+  -H "Authorization: Bearer mr_test_sk_..."
+```
+
+Returns the queue of unmatched payments, each with a flag reason:
+
+<ResponseField name="flagReason" type="enum" required>
+  `NAME_MISMATCH`, `ACCOUNT_SUSPENDED`, `ACCOUNT_NOT_FOUND`, or `AMOUNT_DRIFT`.
+</ResponseField>
+<ResponseField name="senderDetails" type="object" required>
+  Whatever sender information Nomba's webhook provided — name, originating bank, account number where available.
+</ResponseField>
+
+## Resolving it
+
+Once a human (or your own automated rule) reviews the flagged payment, the typical resolution is a refund back to the sender:
+
+```bash
+curl -X POST https://api.meroe.dev/v1/reconciliation/{id}/refund \
+  -H "Authorization: Bearer mr_test_sk_..."
+```
+
+This posts a `SUSPENSE_RESOLUTION_REFUND` ledger entry, moving the funds out of `@suspense/NGN` and initiating an outbound transfer back to the sender's account via Nomba's transfer API.
+
+```
+DEBIT  @suspense/NGN          200,000.00
+CREDIT @external/NGN          200,000.00
+```
+
+<Note>
+Refunds are not the only resolution — if the correct customer is identifiable despite the mismatch (e.g. a known nickname or maiden name), the payment can instead be manually reassigned to the correct customer's balance rather than refunded.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Reconciliation" href="/docs/concepts/reconciliation">
+    The full matching pipeline this flow depends on.
+  </Card>
+  <Card title="Sandbox" href="/docs/guides/sandbox">
+    Trigger a `MISDIRECTED_NAME` scenario on demand for testing.
+  </Card>
+</CardGroup>

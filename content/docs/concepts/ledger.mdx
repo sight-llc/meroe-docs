@@ -1,0 +1,50 @@
+---
+title: The Ledger
+description: Double-entry accounting, explained simply, and why every balance in Meroe traces back to it.
+---
+
+Every balance you see in Meroe — a customer's available balance, the platform's total float, a suspense account holding an unmatched payment — is a *derived view* of an underlying ledger. The ledger, not the balance, is the source of truth.
+
+## Why not just store a balance number?
+
+If you store balance as a single mutable number on a customer row, you have no way to answer "how did it get here," no way to detect drift if a bug double-credits something, and no way to reconstruct history. A ledger fixes this by recording every movement of money as an immutable, append-only entry.
+
+## Double-entry, briefly
+
+Every transaction has at least two legs that net to zero — a debit and a credit:
+
+```
+DEBIT  @external/NGN          500,000.00
+CREDIT @customer:cus_123:NGN  500,000.00
+```
+
+`@external/NGN` represents money entering the system from outside (a real bank transfer). `@customer:cus_123:NGN` is that specific customer's NGN balance. The two legs always sum to zero — money isn't created or destroyed, only moved between named accounts.
+
+<Info>
+This namespaced account addressing (`@external`, `@suspense`, `@customer:{id}:{currency}`) is the same pattern used by [Formance Ledger](https://github.com/formancehq/ledger), one of the systems this design was researched from.
+</Info>
+
+## Balances are reconstructed, not trusted blindly
+
+A customer's current balance is calculated by summing every posted ledger entry against their account — not read from a cached field that could drift. Meroe also takes periodic balance snapshots so reconstruction doesn't mean replaying the entire history on every read, and runs a hash-chain integrity check across the ledger so any tampering or bug-induced inconsistency is detectable, not silent.
+
+## Account types you'll see
+
+| Account | Purpose |
+|---|---|
+| `@customer:{id}:{currency}` | A specific customer's spendable balance |
+| `@external/{currency}` | Money entering or leaving the system from outside (real bank movement) |
+| `@suspense/{currency}` | Holds funds for payments that failed reconciliation, pending resolution |
+
+## Where this matters to you as an integrator
+
+You won't write ledger entries directly — they're posted internally as a side effect of reconciliation, refunds, and account lifecycle events. What you *will* do is read balances and statements, which are guaranteed to be consistent with the underlying transaction history because they're derived from it, not maintained separately.
+
+<CardGroup cols={2}>
+  <Card title="Reconciliation" href="/docs/concepts/reconciliation">
+    How inbound payments turn into ledger entries.
+  </Card>
+  <Card title="Statements" href="/docs/guides/statements">
+    Query and export the transaction history behind a balance.
+  </Card>
+</CardGroup>

@@ -1,0 +1,76 @@
+---
+title: Webhooks
+description: Inbound webhooks from Nomba vs outbound webhooks to you, and how to verify them.
+---
+
+Meroe sits between two webhook relationships: it *receives* events from Nomba, and it *sends* events to you. These are easy to conflate but solve different problems.
+
+## Inbound: Nomba → Meroe
+
+When money lands in a customer's NUBAN, Nomba sends a webhook to Meroe's internal endpoint. This is what kicks off [reconciliation](/docs/concepts/reconciliation). You never receive this webhook directly, and you don't need to configure anything for it — it's internal plumbing.
+
+## Outbound: Meroe → you
+
+Once a payment is reconciled (or fails to reconcile, or a customer's KYC tier limit is breached, or an account is suspended), Meroe sends a webhook to the endpoint you've configured. This is the one you build against.
+
+```json
+{
+  "event": "payment.matched",
+  "data": {
+    "customerId": "cus_123",
+    "amount": 500000,
+    "currency": "NGN",
+    "reconciledAt": "2026-06-21T10:00:00Z"
+  },
+  "requestId": "req_abc123"
+}
+```
+
+### Verifying the signature
+
+Every outbound webhook is signed with HMAC so you can confirm it actually came from Meroe and wasn't forged or replayed:
+
+<CodeGroup>
+```typescript title="Node.js"
+import crypto from 'crypto'
+
+function verifyWebhook(payload: string, signature: string, secret: string) {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex')
+
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature)
+  )
+}
+```
+</CodeGroup>
+
+<Warning>
+Always compare signatures with a constant-time comparison (like `timingSafeEqual`), not `===`, to avoid timing attacks.
+</Warning>
+
+## Delivery guarantees
+
+Webhooks are delivered using an outbox pattern — the event is durably recorded before delivery is attempted, so a delivery failure doesn't mean the event is lost. Failed deliveries retry with backoff and land in a dead-letter queue if they're exhausted, visible to admins.
+
+## Events you can subscribe to
+
+| Event | Fired when |
+|---|---|
+| `payment.matched` | An inbound payment is successfully reconciled |
+| `payment.unmatched` | A payment fails reconciliation and is flagged |
+| `kyc.limit_breach` | A payment would exceed the customer's KYC tier balance threshold |
+| `account.suspended` | An account transitions to `SUSPENDED` |
+| `refund.completed` | A misdirected payment refund is processed |
+
+<CardGroup cols={2}>
+  <Card title="Authentication" href="/docs/guides/authentication">
+    API keys, scopes, and how your webhook secret is generated.
+  </Card>
+  <Card title="Misdirected Payments" href="/docs/guides/misdirected">
+    The flow that triggers `payment.unmatched`.
+  </Card>
+</CardGroup>

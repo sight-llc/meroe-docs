@@ -1,0 +1,58 @@
+---
+title: Welcome to Meroe
+description: Dedicated virtual account infrastructure on top of Nomba's API — identity, reconciliation, ledger, and lifecycle, in one platform.
+---
+
+**Meroe** is a virtual account infrastructure layer that sits on top of Nomba's raw API. Nomba gives you a virtual account number, a webhook when money lands, and a transaction list. Meroe gives you everything a fintech team actually needs on top of that: customer identity, automatic reconciliation, a double-entry ledger, misdirected payment detection, statements, and lifecycle management — behind one clean API.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/docs/getting-started">
+    Register, create your first customer, and receive your first reconciled
+    payment in 15 minutes.
+  </Card>
+  <Card title="Reconciliation" icon="code" href="/docs/concepts/reconciliation">
+    Understand how inbound payments are automatically matched to customers.
+  </Card>
+  <Card title="API Reference" icon="gear" href="/docs/api-reference">
+    Every endpoint, parameter, and response schema, generated from our OpenAPI
+    spec.
+  </Card>
+  <Card title="SDK" icon="rocket" href="/docs/sdk">
+    Install the typed TypeScript client and skip writing your own HTTP wrapper.
+  </Card>
+</CardGroup>
+
+## Why teams use Meroe
+
+Most teams building on Nomba rebuild the same layer from scratch: an identity model, a reconciliation engine, a statement system, misdirected-payment handling, and an account lifecycle. Meroe builds it once, correctly, so you don't have to.
+
+| Capability                                | Raw Nomba API | Meroe |
+| ----------------------------------------- | ------------- | ----- |
+| Create virtual accounts                   | ✅            | ✅    |
+| Basic reconciliation                      | ✅            | ✅    |
+| Double-entry financial ledger             | ❌            | ✅    |
+| Rename with full audit trail              | ❌            | ✅    |
+| Misdirected payment detection + refund    | ❌            | ✅    |
+| Account closure with grace period         | ❌            | ✅    |
+| KYC tier enforcement via balance monitors | ❌            | ✅    |
+| PDF / CSV statements                      | ❌            | ✅    |
+| Outbound webhooks with HMAC signing       | ❌            | ✅    |
+| Scoped developer auth + sandbox           | ❌            | ✅    |
+
+<Tip>
+  New to Meroe? Start with [Getting Started](/docs/getting-started), then read
+  [Reconciliation](/docs/concepts/reconciliation) to understand the core engine.
+</Tip>
+
+## How the docs are organized
+
+- **Concepts** — what reconciliation, the ledger, virtual accounts, webhooks, and KYC tiers actually are, and why they work the way they do.
+- **Guides** — task-oriented walkthroughs: authentication, the sandbox, handling misdirected payments, pulling statements.
+- **API Reference** — every endpoint generated directly from our OpenAPI spec. This is the technical reference; for the live interactive version with request signing, see [Swagger UI](https://meroe.ddns.net/swagger-ui/index.html).
+- **SDK** — the typed `meroe-sdk` npm package.
+
+<Note>
+  Looking for the raw endpoint signatures only? [Swagger
+  UI](https://meroe.ddns.net/swagger-ui/index.html) is the fastest path. This
+  site is for understanding *why* and *how* — Swagger is for *what*.
+</Note>

@@ -1,0 +1,53 @@
+---
+title: Errors
+description: Every Meroe error code, what it means, and how to fix it.
+---
+
+All Meroe errors share a consistent shape, including a `requestId` you should log and reference when reaching out for support:
+
+```json
+{
+  "error": {
+    "code": "customer_not_found",
+    "message": "No customer found with id cus_123",
+    "requestId": "req_7f3a2b1c"
+  }
+}
+```
+
+## Common error codes
+
+<ResponseField name="invalid_api_key" type="401">
+  The key is malformed, revoked, or doesn't match the environment (`test`/`live`) of the resource being accessed.
+</ResponseField>
+<ResponseField name="insufficient_scope" type="403">
+  The key is valid but lacks the scope required for this operation. See [scopes](/docs/guides/authentication#scopes).
+</ResponseField>
+<ResponseField name="customer_not_found" type="404">
+  No customer exists with the given id, or it belongs to a different environment than your key.
+</ResponseField>
+<ResponseField name="account_closed" type="409">
+  The operation can't proceed because the target account is in `CLOSED` state. See [lifecycle](/docs/guides/lifecycle).
+</ResponseField>
+<ResponseField name="balance_nonzero" type="409">
+  Account closure was rejected because the balance isn't zero. Settle the balance first.
+</ResponseField>
+<ResponseField name="kyc_limit_exceeded" type="422">
+  The requested operation would breach the customer's KYC tier balance threshold. See [KYC tiers](/docs/concepts/kyc-tiers).
+</ResponseField>
+<ResponseField name="rate_limited" type="429">
+  Too many requests for this key in the current window. Check the `X-RateLimit-*` response headers for reset timing.
+</ResponseField>
+
+<Tip>
+Every response includes rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) regardless of whether the request succeeded — useful for backing off before you actually hit `429`.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="Authentication" href="/docs/guides/authentication">
+    Fixing `invalid_api_key` and `insufficient_scope`.
+  </Card>
+  <Card title="API Reference" href="/docs/api-reference">
+    Per-endpoint error responses.
+  </Card>
+</CardGroup>

@@ -1,0 +1,65 @@
+---
+title: SDK
+description: The typed meroe-sdk npm package, generated from the OpenAPI spec.
+---
+
+`meroe-sdk` is a TypeScript client generated directly from our OpenAPI spec, so it's always in sync with the live API surface. It handles auth header injection, typed responses, typed errors, and auto-pagination on list endpoints.
+
+## Install
+
+```bash
+npm install meroe-sdk
+```
+
+## Usage
+
+```typescript
+import { Meroe } from 'meroe-sdk'
+
+const client = new Meroe({ apiKey: 'mr_test_sk_...' })
+
+const customer = await client.customers.create({
+  fullName: 'Aisha Mohammed',
+  kycTier: 'TIER_1',
+  bvn: '12345678901',
+})
+
+console.log(customer.account.accountNumber) // 8012345678
+```
+
+## Auto-pagination
+
+List endpoints — like statement queries or the unmatched-payments queue — return an async iterator under the hood, so you don't manually manage cursors:
+
+```typescript
+for await (const txn of client.customers.listTransactions('cus_123')) {
+  console.log(txn.amount, txn.status)
+}
+```
+
+## Typed errors
+
+API errors throw a typed `MeroeError` with the same `requestId` and error code surfaced in the raw HTTP response, so you can branch on error type without string-matching messages:
+
+```typescript
+try {
+  await client.customers.create({ fullName: '', kycTier: 'TIER_1' })
+} catch (err) {
+  if (err instanceof MeroeError) {
+    console.error(err.code, err.requestId)
+  }
+}
+```
+
+<Note>
+The SDK is currently `0.1.0-beta` — the happy path for customers, accounts, statements, and reconciliation is covered. See the [changelog](/docs/changelog) for what's still in progress.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Authentication" href="/docs/guides/authentication">
+    Where the API key passed to the client comes from.
+  </Card>
+  <Card title="API Reference" href="/docs/api-reference">
+    The full endpoint surface the SDK wraps.
+  </Card>
+</CardGroup>

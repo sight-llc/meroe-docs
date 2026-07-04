@@ -1,0 +1,80 @@
+---
+title: Getting Started
+description: Register, create your first customer, and receive a reconciled payment — in about 15 minutes.
+---
+
+This walks through the full happy path: register as a developer, create a customer with a dedicated NUBAN, and watch an inbound payment get automatically reconciled.
+
+<Steps>
+  <Step title="Register and get your API keys">
+    Create a developer account. Two sandbox API keys are generated automatically — a publishable key and a secret key.
+
+    ```bash
+    curl -X POST https://api.meroe.dev/v1/auth/register \
+      -H "Content-Type: application/json" \
+      -d '{"email": "you@yourcompany.com", "password": "..."}'
+    ```
+
+    Your secret key (`mr_test_sk_...`) is shown once. Store it securely — see [Authentication](/docs/guides/authentication) for key rotation and scopes.
+  </Step>
+
+  <Step title="Create your first customer">
+    Every customer gets a dedicated Nigerian bank account number (NUBAN), provisioned through Nomba and tied to a customer identity that Meroe tracks forever.
+
+    ```bash
+    curl -X POST https://api.meroe.dev/v1/customers \
+      -H "Authorization: Bearer mr_test_sk_..." \
+      -H "Content-Type: application/json" \
+      -d '{
+        "fullName": "Aisha Mohammed",
+        "kycTier": "TIER_1",
+        "bvn": "12345678901"
+      }'
+    ```
+
+    The response includes the customer profile and the account's `accountNumber`.
+  </Step>
+
+  <Step title="Simulate an inbound payment">
+    In sandbox, you don't need a real bank transfer to test reconciliation — use the simulator.
+
+    ```bash
+    curl -X POST https://api.meroe.dev/v1/sandbox/simulate/payment \
+      -H "Authorization: Bearer mr_test_sk_..." \
+      -H "Content-Type: application/json" \
+      -d '{
+        "accountNumber": "8012345678",
+        "amount": 500000,
+        "senderName": "Aisha Mohammed"
+      }'
+    ```
+  </Step>
+
+  <Step title="Watch it reconcile">
+    Within seconds, the payment is matched and posted to the customer's balance. Confirm it:
+
+    ```bash
+    curl https://api.meroe.dev/v1/customers/{id}/balance \
+      -H "Authorization: Bearer mr_test_sk_..."
+    ```
+
+    Behind the scenes, this posted a double-entry ledger transaction: a debit to `@external/NGN` and a credit to `@customer:{id}:NGN`. Read [Reconciliation](/docs/concepts/reconciliation) and [The Ledger](/docs/concepts/ledger) to understand what just happened.
+  </Step>
+</Steps>
+
+## What's next
+
+<CardGroup cols={2}>
+  <Card title="Reconciliation" href="/docs/concepts/reconciliation">
+    How inbound payments get matched, and what happens when they don't.
+  </Card>
+  <Card title="Misdirected Payments" href="/docs/guides/misdirected">
+    Detection logic and the refund flow for money sent to the wrong place.
+  </Card>
+  <Card title="Webhooks" href="/docs/concepts/webhooks">
+    Get notified the moment a payment lands, signed and verifiable.
+  </Card>
+  <Card title="SDK" href="/docs/sdk">
+    Skip the raw HTTP calls — use the typed `meroe-sdk` client instead.
+  </Card>
+</CardGroup>

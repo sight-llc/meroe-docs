@@ -1,0 +1,56 @@
+---
+title: Sandbox
+description: Simulate payments and edge-case scenarios without moving real money.
+---
+
+The sandbox lets you exercise every part of Meroe — normal reconciliation, misdirected payments, KYC limit breaches — without a real bank transfer ever happening.
+
+## Simulating a normal payment
+
+```bash
+curl -X POST https://api.meroe.dev/v1/sandbox/simulate/payment \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountNumber": "8012345678",
+    "amount": 500000,
+    "senderName": "Aisha Mohammed"
+  }'
+```
+
+A matching `senderName` reconciles immediately, just like a real transfer would.
+
+## Scenario presets
+
+The simulator accepts a `scenario` field to trigger specific edge cases instead of computing match logic from the input:
+
+<ParamField body="scenario" type="enum">
+  One of `MISDIRECTED_NAME`, `MISDIRECTED_ACCOUNT_CLOSED`, `KYC_LIMIT_BREACH`, `DUPLICATE_PAYMENT`. Omit for normal happy-path matching.
+</ParamField>
+
+```bash
+curl -X POST https://api.meroe.dev/v1/sandbox/simulate/payment \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountNumber": "8012345678",
+    "amount": 500000,
+    "senderName": "Different Person",
+    "scenario": "MISDIRECTED_NAME"
+  }'
+```
+
+This forces an `UNMATCHED` result with `NAME_MISMATCH` as the flag reason, so you can build and test your misdirected-payment handling UI without waiting for a real mismatch to occur naturally.
+
+<Tip>
+Every simulated payment is visible in your dashboard's reconciliation board exactly like a real one — there's no separate "sandbox view." Sandbox and live data are fully isolated by key environment, not by a different UI.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="Misdirected Payments" href="/docs/guides/misdirected">
+    What to do once a payment lands as `UNMATCHED`.
+  </Card>
+  <Card title="Getting Started" href="/docs/getting-started">
+    The full happy-path walkthrough using these same simulator calls.
+  </Card>
+</CardGroup>

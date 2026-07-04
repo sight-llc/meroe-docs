@@ -1,0 +1,56 @@
+---
+title: Authentication
+description: API keys, scopes, sandbox vs live, and key rotation.
+---
+
+Meroe uses API key authentication, modeled closely on Stripe's key design.
+
+## Key format
+
+```
+mr_test_sk_4eC39HqLyjWDarjtT1zdp7dc   ← sandbox secret key
+mr_live_sk_4eC39HqLyjWDarjtT1zdp7dc   ← live secret key
+mr_test_pk_4eC39HqLyjWDarjtT1zdp7dc   ← sandbox publishable key
+```
+
+The `test`/`live` segment determines which environment the key operates in — sandbox keys can only touch sandbox-simulated data, live keys touch real money movement. Secret keys (`sk`) authenticate server-to-server calls; publishable keys (`pk`) are safe to expose client-side for limited, read-only operations.
+
+## Using a key
+
+```bash
+curl https://api.meroe.dev/v1/customers \
+  -H "Authorization: Bearer mr_test_sk_..."
+```
+
+<Warning>
+Secret keys are shown exactly once, at creation time, then stored only as a SHA-256 hash on our side. If you lose it, you'll need to roll the key — there's no way to retrieve it again.
+</Warning>
+
+## Scopes
+
+Keys can be scoped to limit what they're allowed to do — useful for giving a frontend service a narrower key than your backend.
+
+| Scope | Grants |
+|---|---|
+| `customers:read` | Read customer profiles and balances |
+| `customers:write` | Create and update customers |
+| `payments:read` | Read transaction and reconciliation status |
+| `statements:read` | Pull statements |
+| `admin` | Full access (secret keys only) |
+
+## Rotating a key
+
+Key creation and rotation happen through the **dashboard** (`app.meroe.dev`), authenticated by your dashboard session — not by an infrastructure endpoint your backend calls directly, which is why you won't find it in the [API Reference](/docs/api-reference). Roll a key from the API Keys page: name → Roll → the old key keeps working for a 24-hour grace period so you can deploy the replacement without a hard cutover.
+
+<Note>
+If your team needs to script key rotation as part of a deploy pipeline rather than doing it manually in the dashboard, reach out — programmatic key rotation isn't part of the current infrastructure API surface.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Sandbox" href="/docs/guides/sandbox">
+    Test scenarios without touching real money.
+  </Card>
+  <Card title="Webhooks" href="/docs/concepts/webhooks">
+    Your webhook signing secret is generated alongside your API keys.
+  </Card>
+</CardGroup>

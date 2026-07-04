@@ -1,0 +1,48 @@
+---
+title: Statements
+description: Query a customer's transaction history and export it as PDF or CSV.
+---
+
+A statement is a derived view over the [ledger](/docs/concepts/ledger) for a given customer and date range — it's never a separately maintained record, so it's guaranteed to match the balance shown elsewhere.
+
+## Querying as JSON
+
+```bash
+curl "https://api.meroe.dev/v1/customers/{id}/statement?from=2026-01-01&to=2026-03-31" \
+  -H "Authorization: Bearer mr_test_sk_..."
+```
+
+<ResponseField name="openingBalance" type="number" required>
+  Balance at the start of the requested range.
+</ResponseField>
+<ResponseField name="closingBalance" type="number" required>
+  Balance at the end of the requested range.
+</ResponseField>
+<ResponseField name="transactions" type="array" required>
+  Every posted ledger entry affecting this customer's balance within the range, in chronological order.
+</ResponseField>
+
+## Exporting as PDF or CSV
+
+```bash
+# PDF
+curl "https://api.meroe.dev/v1/customers/{id}/statement/pdf?from=2026-01-01&to=2026-03-31" \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -o statement.pdf
+
+# CSV
+curl "https://api.meroe.dev/v1/customers/{id}/statement/csv?from=2026-01-01&to=2026-03-31" \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -o statement.csv
+```
+
+Both formats include the same opening balance, closing balance, and transaction list as the JSON response — the PDF additionally includes customer identity details suitable for sharing externally (e.g. with the customer themselves, or for compliance requests).
+
+<CardGroup cols={2}>
+  <Card title="The Ledger" href="/docs/concepts/ledger">
+    Why a statement is always consistent with the balance.
+  </Card>
+  <Card title="SDK" href="/docs/sdk">
+    Statement queries auto-paginate when using the typed client.
+  </Card>
+</CardGroup>

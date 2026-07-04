@@ -1,0 +1,53 @@
+---
+title: API Reference
+description: Every Meroe developer endpoint, generated from our OpenAPI spec.
+---
+
+This section is **auto-generated** from the live OpenAPI spec at `OPENAPI_SPEC_URL`. Don't hand-edit pages under `api-reference/` — your changes will be wiped the next time the generator runs. Put explanatory content in `concepts/` or `guides/` and link here instead.
+
+<Note>
+  For a live interactive console with request signing, use [Swagger
+  UI](https://meroe.ddns.net/swagger-ui/index.html). This section is the
+  readable reference — Swagger is the testing console. Each page here also has a
+  **Try it** button that opens the playground directly.
+</Note>
+
+## What's documented here
+
+Everything a developer building on Meroe needs to call:
+
+- **Developer Auth** — login and token refresh (`/v1/developers/auth/login`, `/v1/developers/auth/refresh`). Registration is not included — onboarding happens via `app.meroe.dev`, not the API.
+- **Apps** — create and list app namespaces that scope customers and virtual accounts
+- **API Keys** — mint, list, and revoke scoped API keys programmatically
+- **Customers** — create customers, provision NUBANs, query balances and identity
+
+<Note>
+  Every route under `/v1/admin/` is intentionally excluded — those are internal
+  tools for the Meroe team (KYC approval, platform stats, reconciliation rule
+  management, audit log), not endpoints integrators call.
+</Note>
+
+## Base URL
+
+```
+https://api.meroe.dev/v1
+```
+
+## Authentication
+
+All endpoints except login and refresh require a bearer token:
+
+```bash
+curl https://api.meroe.dev/v1/customers \
+  -H "Authorization: Bearer mr_test_sk_..."
+```
+
+See [Authentication](/docs/guides/authentication) for key scopes, rotation, and sandbox vs live keys.
+
+## Regenerating this section
+
+```bash
+npm run gen-api
+```
+
+Fetches the spec from `OPENAPI_SPEC_URL`, regenerates all pages under `content/docs/api-reference/`, and writes `public/api-spec.json` which powers the in-page API playground.

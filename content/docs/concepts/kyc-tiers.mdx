@@ -1,0 +1,42 @@
+---
+title: KYC Tiers
+description: Tier limits, and what changes when a customer upgrades.
+---
+
+Nigerian fintech regulation ties transaction and balance limits to a customer's KYC verification level. Meroe enforces these limits automatically using balance monitors attached to each account — you don't have to write threshold-checking logic yourself.
+
+## Tiers
+
+| Tier | Verification | Balance threshold |
+|---|---|---|
+| `TIER_1` | BVN only | ₦300,000 |
+| `TIER_2` | BVN + ID document | ₦500,000 |
+| `TIER_3` | Full KYC + address verification | Unlimited |
+
+<Note>
+Threshold values shown are the defaults used in this build — confirm against your deployment's configured monitors via `GET /v1/customers/{id}` if you've customized them.
+</Note>
+
+## What a balance monitor does
+
+A balance monitor watches a customer's account and evaluates incoming payments against the tier threshold *before* they're allowed to post normally. If a payment would push the balance over the customer's tier limit, it's flagged and a `kyc.limit_breach` webhook fires — the payment is held rather than silently accepted past a regulatory limit.
+
+## Upgrading a tier
+
+```bash
+curl -X PATCH https://api.meroe.dev/v1/customers/{id}/kyc-tier \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -H "Content-Type: application/json" \
+  -d '{"kycTier": "TIER_2"}'
+```
+
+This updates the monitor's threshold immediately. It does not retroactively change anything about funds already posted — only future inbound payments are evaluated against the new limit.
+
+<CardGroup cols={2}>
+  <Card title="Virtual Accounts" href="/docs/concepts/virtual-accounts">
+    How tiers attach to an account.
+  </Card>
+  <Card title="Webhooks" href="/docs/concepts/webhooks">
+    Subscribing to `kyc.limit_breach`.
+  </Card>
+</CardGroup>

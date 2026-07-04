@@ -1,0 +1,54 @@
+---
+title: Account Lifecycle
+description: Suspension, closure, and the grace period before funds are released.
+---
+
+A Meroe account moves through a small, explicit set of states — never an ambiguous "is this account still usable?" guess.
+
+## States
+
+| State | Meaning |
+|---|---|
+| `ACTIVE` | Normal operation — inbound payments reconcile and post normally |
+| `SUSPENDED` | Inbound payments are accepted by the bank but held in `@suspense/NGN`, not posted to balance |
+| `CLOSED` | No further inbound payments are accepted |
+
+## Suspending an account
+
+```bash
+curl -X POST https://api.meroe.dev/v1/accounts/{id}/suspend \
+  -H "Authorization: Bearer mr_test_sk_..."
+```
+
+A suspended account's NUBAN is still technically receivable from the bank's side — Nomba doesn't reject the transfer — but Meroe routes any inbound payment straight to suspense rather than crediting the customer, since the account is suspended specifically because something needs review before money should move.
+
+## Closing an account
+
+Closure isn't instant. A grace period elapses first, during which the account remains visible (read-only) for any in-flight reconciliation or compliance review to complete:
+
+```bash
+curl -X POST https://api.meroe.dev/v1/accounts/{id}/close \
+  -H "Authorization: Bearer mr_test_sk_..."
+```
+
+<Warning>
+An account cannot be closed with a non-zero balance. Settle or withdraw the remaining balance first, or the close request will be rejected.
+</Warning>
+
+## Every transition is audited
+
+State changes are written to the `account_events` timeline alongside renames and KYC tier changes, queryable via:
+
+```bash
+curl https://api.meroe.dev/v1/customers/{id}/events \
+  -H "Authorization: Bearer mr_test_sk_..."
+```
+
+<CardGroup cols={2}>
+  <Card title="Virtual Accounts" href="/docs/concepts/virtual-accounts">
+    What stays bound to an account through these transitions.
+  </Card>
+  <Card title="KYC Tiers" href="/docs/concepts/kyc-tiers">
+    Tier changes are tracked the same way as lifecycle transitions.
+  </Card>
+</CardGroup>

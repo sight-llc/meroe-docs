@@ -1,0 +1,55 @@
+---
+title: Reconciliation
+description: How Meroe matches inbound payments to customers, automatically.
+---
+
+Reconciliation is the process of taking a raw inbound transfer — an amount, a sender name, an account number, a timestamp — and confidently tying it to the right customer and the right ledger entry. It is the single hardest problem in virtual account infrastructure, and it's the one Nomba's raw API leaves entirely to you.
+
+## Why it's hard
+
+A NUBAN tells you *which account* money landed in. It does not tell you, on its own, whether the sender actually meant to pay that customer, whether the amount matches an expectation, or whether this is the second copy of a payment that already landed. Banks and senders are inconsistent: names get truncated, middle initials disappear, amounts get rounded by the sending bank's UI.
+
+## How Meroe reconciles
+
+Every inbound webhook from Nomba is run through a matching pipeline before any balance is touched:
+
+1. **Account match** — does the destination account number correspond to an active customer account?
+2. **Identity match** — does the sender name reasonably match the customer's registered name, allowing for common transformations (case, whitespace, middle-name omission)?
+3. **Drift tolerance** — for rule-based matches against an expected amount, is the received amount within configured tolerance?
+
+If all checks pass, the payment is marked `MATCHED` and posted directly to the customer's ledger balance. If any check fails, it's marked `UNMATCHED` and routed to the [misdirected payment flow](/docs/guides/misdirected) instead of silently crediting the wrong balance.
+
+<Tip>
+This three-strategy design — account, identity, and amount-tolerance matching — is adapted from [Blnk Finance's](https://docs.blnkfinance.com) reconciliation rules engine.
+</Tip>
+
+## What "matched" actually does
+
+A matched payment isn't just a status flag. It triggers a real double-entry ledger transaction:
+
+```
+DEBIT  @external/NGN          500,000.00
+CREDIT @customer:{id}:NGN     500,000.00
+```
+
+This is what makes the balance trustworthy — it's never just "we incremented a number," it's a posted transaction with a permanent, auditable record. See [The Ledger](/docs/concepts/ledger) for how that's structured.
+
+## Unmatched payments
+
+When a payment doesn't pass matching, the money still has to go *somewhere* — it's never silently lost or stuck unposted. It lands in a suspense account:
+
+```
+DEBIT  @external/NGN          200,000.00
+CREDIT @suspense/NGN          200,000.00
+```
+
+From there it's visible on the reconciliation board with a flag reason (`NAME_MISMATCH`, `ACCOUNT_SUSPENDED`, etc.), and can be resolved manually — typically via refund. Walk through this in [Misdirected Payment Handling](/docs/guides/misdirected).
+
+<CardGroup cols={2}>
+  <Card title="The Ledger" href="/docs/concepts/ledger">
+    Double-entry accounting, explained simply.
+  </Card>
+  <Card title="Misdirected Payments" href="/docs/guides/misdirected">
+    What happens when reconciliation fails, and how to resolve it.
+  </Card>
+</CardGroup>

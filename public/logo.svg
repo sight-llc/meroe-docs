@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Pyramid tiers -->
+  <polygon points="20,3 37,35 3,35" fill="currentColor" opacity="0.10"/>
+  <polygon points="20,9 33,31 7,31" fill="currentColor" opacity="0.16"/>
+  <polygon points="20,16 27,28 13,28" fill="currentColor" opacity="0.24"/>
+  <!-- M mark cut through pyramid -->
+  <path d="M10 29 L10 18 L15 24 L20 18 L25 24 L30 18 L30 29" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

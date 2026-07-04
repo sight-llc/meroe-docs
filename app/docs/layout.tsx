@@ -1,0 +1,83 @@
+import { source } from '@/lib/docs-source'
+import { DocsSidebar } from '../components/docs/docs-sidebar'
+import { DocsHeader } from '../components/docs/docs-header'
+import { DocsNavTabs } from '../components/docs/docs-nav-tabs'
+import { siteConfig } from '@/lib/theme-config'
+import { PlaygroundProvider } from '../components/docs/api-playground/context'
+import { PlaygroundModal } from '../components/docs/api-playground/playground-modal'
+
+export default function DocsLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const tree = source.pageTree
+
+  return (
+    <PlaygroundProvider>
+    <div className="min-h-screen flex flex-col">
+      {/* Header with mobile navigation */}
+      <DocsHeader tree={tree} />
+
+      {/* Navigation tabs (Documentation / API Reference) */}
+      <div className="sticky top-16 z-30 bg-background border-b border-border hidden lg:block">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <DocsNavTabs />
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex gap-8">
+            <DocsSidebar tree={tree} />
+            <main className="flex-1 min-w-0">
+              {children}
+            </main>
+          </div>
+        </div>
+      </div>
+
+      <PlaygroundModal />
+
+      {/* Footer */}
+      <footer className="border-t border-border py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} {siteConfig.footer.companyName}. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              {siteConfig.footer.links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <span className="text-muted-foreground/50">|</span>
+              <span className="text-xs text-muted-foreground/70">For AI:</span>
+              <a
+                href="/llms.txt"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors font-mono"
+              >
+                llms.txt
+              </a>
+              <a
+                href="/llms-full.txt"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors font-mono"
+              >
+                llms-full.txt
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    </PlaygroundProvider>
+  )
+}
