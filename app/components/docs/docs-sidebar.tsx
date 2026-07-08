@@ -186,7 +186,7 @@ function SidebarNode({ node, pathname, level }: SidebarNodeProps) {
         )}
       >
         {httpMethod && <HttpMethodBadge method={httpMethod} />}
-        <span>{node.name}</span>
+        <span className="min-w-0 truncate">{node.name}</span>
       </Link>
     </li>
   )

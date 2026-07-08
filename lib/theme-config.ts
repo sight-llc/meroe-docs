@@ -11,7 +11,7 @@ export const siteConfig = {
   },
 
   links: {
-    github: 'https://github.com/sight-llc/nombadva',
+    github: 'https://github.com/sight-llc/meroe-sdk',
     discord: '',
     twitter: '',
     support: 'mailto:praiseubong@gmail.com',
@@ -22,7 +22,7 @@ export const siteConfig = {
     links: [
       { label: 'API Status', href: 'https://meroe.ddns.net/swagger-ui/index.html' },
       { label: 'Dashboard', href: 'https://app-meroe.netlify.app' },
-      { label: 'GitHub', href: 'https://github.com/sight-llc/nombadva' },
+      { label: 'GitHub', href: 'https://github.com/sight-llc/meroe-sdk' },
     ],
   },
 }

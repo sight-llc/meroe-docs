@@ -346,10 +346,19 @@ function curlExample(method, opPath, baseUrl, parameters = [], requestBody, spec
   return lines.join('\n')
 }
 
+// ─── MDX escaping helpers ─────────────────────────────────────────────────────
+// Curly braces in MDX text (both frontmatter and body) must be escaped so the
+// MDX compiler does not interpret them as JavaScript expressions.
+// HTML entities (&#123; / &#125;) are safe for YAML frontmatter strings and
+// render as { and } in the browser without being evaluated as JS.
+function escapeMdxBraces(str) {
+  return str.replace(/\{/g, '&#123;').replace(/\}/g, '&#125;')
+}
+
 // ─── MDX page builder ─────────────────────────────────────────────────────────
 function buildMdx({ method, opPath, operation, spec, baseUrl }) {
-  const title       = operation.summary || `${method.toUpperCase()} ${opPath}`
-  const description = (operation.description || operation.summary || '').replace(/\n/g, ' ')
+  const title       = escapeMdxBraces(operation.summary || `${method.toUpperCase()} ${opPath}`)
+  const description = escapeMdxBraces((operation.description || operation.summary || '').replace(/\n/g, ' '))
   const pathQueryParams = paramFieldsFor(operation.parameters || [])
   const bodyParams  = bodyFieldsFor(operation.requestBody, spec)
   const hasParams   = pathQueryParams || bodyParams
