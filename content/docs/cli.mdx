@@ -1,0 +1,84 @@
+---
+title: CLI
+description: The meroe-cli — manage customers, trigger sandbox scenarios, and inspect the ledger from your terminal.
+---
+
+`meroe-cli` is a command-line tool for interacting with the Meroe API without writing code. It's useful for quick queries, testing sandbox scenarios, inspecting the ledger, scripting integration tests, and automating operational tasks.
+
+## Install
+
+### Download a pre-built binary
+
+Grab the latest release for your platform from the [releases page](https://github.com/sight-llc/meroe-cli/releases).
+
+### Build from source
+
+```bash
+git clone https://github.com/sight-llc/meroe-cli.git
+cd meroe-cli
+cargo build --release
+./target/release/meroe --help
+```
+
+## Quickstart
+
+Set your API key as an environment variable or pass it with `--api-key`:
+
+```bash
+export MEROE_API_KEY=mr_test_sk_...
+
+# List your customers
+meroe customers list
+
+# Create a customer
+meroe customers create \
+  --full-name "Aisha Mohammed" \
+  --kyc-tier TIER_1 \
+  --bvn 12345678901
+
+# Check a customer's balance
+meroe customers balance cus_123
+```
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `meroe customers list` | List all customers |
+| `meroe customers get <id>` | Get a customer by ID |
+| `meroe customers balance <id>` | Get a customer's balance |
+| `meroe sandbox simulate` | Trigger a sandbox payment scenario |
+| `meroe transfers list` | List recent transfers |
+| `meroe transfers get <id>` | Get a transfer by ID |
+
+## Sandbox scenarios
+
+The CLI makes it easy to test edge cases without writing HTTP calls:
+
+```bash
+# Trigger a normal payment
+meroe sandbox simulate \
+  --account-number 8012345678 \
+  --amount 500000 \
+  --sender-name "Aisha Mohammed"
+
+# Trigger a misdirected payment
+meroe sandbox simulate \
+  --account-number 8012345678 \
+  --amount 500000 \
+  --sender-name "Wrong Person" \
+  --scenario MISDIRECTED_NAME
+```
+
+<Note>
+The CLI is open source. Contributions, bug reports, and feature requests are welcome at [github.com/sight-llc/meroe-cli](https://github.com/sight-llc/meroe-cli).
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="SDK" href="/docs/sdk">
+    The typed TypeScript client for programmatic access.
+  </Card>
+  <Card title="Sandbox" href="/docs/guides/sandbox">
+    Detailed sandbox scenario documentation.
+  </Card>
+</CardGroup>

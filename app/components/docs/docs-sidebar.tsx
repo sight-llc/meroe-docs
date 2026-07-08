@@ -6,23 +6,14 @@ import { cn } from '@/lib/utils'
 import { siteConfig } from '@/lib/theme-config'
 import type { Root, Node } from 'fumadocs-core/page-tree'
 
-// HTTP method detection from page names
-const HTTP_METHOD_PATTERNS: Record<string, string[]> = {
-  GET: ['List', 'Get', 'Fetch', 'Read', 'Search', 'Query'],
-  POST: ['Create', 'Add', 'Submit', 'Post'],
-  PATCH: ['Update', 'Modify', 'Edit'],
-  PUT: ['Replace', 'Set', 'Put'],
-  DELETE: ['Delete', 'Remove', 'Destroy'],
-  HEAD: ['Check', 'Verify', 'Exists'],
-}
-
-function getHttpMethod(name: string): string | null {
-  for (const [method, patterns] of Object.entries(HTTP_METHOD_PATTERNS)) {
-    if (patterns.some(pattern => name.startsWith(pattern))) {
-      return method
-    }
-  }
-  return null
+// HTTP method extraction from API reference URL slugs.
+// Generated slugs follow the pattern {method}-v1-{path} (e.g. post-v1-customers).
+function getHttpMethodFromUrl(url: string): string | null {
+  // Extract the slug after the last / in /docs/api-reference/
+  const slug = url.split('/').pop() || ''
+  // Match the method prefix (get, post, put, patch, delete) before -v
+  const match = slug.match(/^(get|post|put|patch|delete)(?=-v\d)/i)
+  return match ? match[1].toUpperCase() : null
 }
 
 // HTTP method badge colors
@@ -41,7 +32,7 @@ function HttpMethodBadge({ method }: { method: string }) {
 
   return (
     <span className={cn(
-      'shrink-0 px-1.5 py-0.5 text-[10px] font-semibold rounded',
+      'shrink-0 px-1.5 flex-none py-0.5 text-[10px] font-semibold rounded',
       colors.bg,
       colors.text
     )}>
@@ -169,10 +160,10 @@ function SidebarNode({ node, pathname, level }: SidebarNodeProps) {
 
   const isActive = pathname === node.url
 
-  // Check if this is an API endpoint page and extract the HTTP method
-  const isApiEndpoint = (node.url as string)?.includes('/api-reference/')
-  const nodeName = typeof node.name === 'string' ? node.name : ''
-  const httpMethod = isApiEndpoint ? getHttpMethod(nodeName) : null
+  // Check if this is an API endpoint page and extract the HTTP method from the URL slug
+  const nodeUrl = node.url as string
+  const isApiEndpoint = nodeUrl?.includes('/api-reference/')
+  const httpMethod = isApiEndpoint ? getHttpMethodFromUrl(nodeUrl) : null
 
   return (
     <li className="list-none">

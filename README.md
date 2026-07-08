@@ -4,6 +4,8 @@ Developer documentation for Meroe, built on [Unmint](https://github.com/gregce/u
 
 This site is the **developer-facing** reference — for teams integrating with Meroe's virtual account API. It explains *why* and *how*, not just endpoint shapes. For the raw interactive endpoint console, see Swagger UI at `/v1/docs` on the API itself.
 
+**Live docs:** [https://meroe-docs.vercel.app](https://meroe-docs.vercel.app)
+
 ## Structure
 
 ```
