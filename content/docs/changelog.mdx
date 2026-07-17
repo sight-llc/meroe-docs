@@ -4,7 +4,20 @@ description: What's new in Meroe.
 ---
 
 <Steps>
-  <Step title="0.1.0-beta — Initial public release">
-    Initial public surface: customer creation, virtual account provisioning, automatic reconciliation, double-entry ledger, misdirected payment detection and refund, KYC tier enforcement, account lifecycle (suspend/close), statements (JSON/PDF/CSV), outbound webhooks with HMAC signing, scoped API keys, sandbox simulator, and the `meroe-sdk` TypeScript client.
+  <Step title="v1.0.0 — Nomba Hackathon 2026">
+    Developer auth: JWT login, rotating refresh tokens, logout
+    Apps and scoped API keys (SHA-256 hashed, Redis-cached, instant revoke, roll)
+    Customer provisioning → real Nomba NUBAN via sandbox.nomba.com
+    BVN stored AES-256-GCM encrypted; only masked value returned
+    Tenant isolation — cross-tenant reads return 404, existence never leaked
+    Idempotency-Key support on all write endpoints
+    Rate limiting (Redis fixed-window, X-RateLimit-* headers)
+    Money-in: HMAC-verified inbound webhook → double-entry hash-chained ledger → wallet credit → reconciliation
+    Misdirected payment detection → suspense booking → resolve endpoint
+    Money-out: maker-checker payouts (threshold auto-approve, second-approver flow), inflight reservation
+    Outbound webhooks via transactional outbox with HMAC signing (PAYMENT.RECEIVED, TRANSFER.SETTLED, TRANSFER.FAILED, CUSTOMER.CLOSED)
+    Customer lifecycle: suspend, reactivate, close, KYC tier change
+    Statements: transaction list, statement download
+    RFC 7807 problem responses; no stack traces leak to clients
   </Step>
 </Steps>

@@ -6,23 +6,15 @@ description: Register, create your first customer, and receive a reconciled paym
 This walks through the full happy path: register as a developer, create a customer with a dedicated NUBAN, and watch an inbound payment get automatically reconciled.
 
 <Steps>
-  <Step title="Register and get your API keys">
-    Create a developer account. Two sandbox API keys are generated automatically — a publishable key and a secret key.
-
-    ```bash
-    curl -X POST https://api.meroe.dev/v1/auth/register \
-      -H "Content-Type: application/json" \
-      -d '{"email": "you@yourcompany.com", "password": "..."}'
-    ```
-
-    Your secret key (`mr_test_sk_...`) is shown once. Store it securely — see [Authentication](/docs/guides/authentication) for key rotation and scopes.
+  <Step title="Sign up and get your API key">
+    Create your developer account at https://meroe-developer-dashboard.vercel.app. After signing in, go to Apps → create an app, then API Keys → mint a key. Your secret key (`mr_test_sk_...`) is shown once — copy it now. See [Authentication](/docs/guides/authentication) for scopes and key rotation.
   </Step>
 
   <Step title="Create your first customer">
     Every customer gets a dedicated Nigerian bank account number (NUBAN), provisioned through Nomba and tied to a customer identity that Meroe tracks forever.
 
     ```bash
-    curl -X POST https://api.meroe.dev/v1/customers \
+    curl -X POST https://meroe.ddns.net/v1/customers \
       -H "Authorization: Bearer mr_test_sk_..." \
       -H "Content-Type: application/json" \
       -d '{
@@ -35,30 +27,19 @@ This walks through the full happy path: register as a developer, create a custom
     The response includes the customer profile and the account's `accountNumber`.
   </Step>
 
-  <Step title="Simulate an inbound payment">
-    In sandbox, you don't need a real bank transfer to test reconciliation — use the simulator.
-
-    ```bash
-    curl -X POST https://api.meroe.dev/v1/sandbox/simulate/payment \
-      -H "Authorization: Bearer mr_test_sk_..." \
-      -H "Content-Type: application/json" \
-      -d '{
-        "accountNumber": "8012345678",
-        "amount": 500000,
-        "senderName": "Aisha Mohammed"
-      }'
-    ```
+  <Step title="Trigger a test payment">
+    In sandbox, send a real transfer from any bank app to your customer's NUBAN using Nomba's test sandbox, or use `POST /v1/webhook-subscriptions/{id}/test` to send a test event to your registered webhook URL. The [Sandbox](/docs/guides/sandbox) guide covers both approaches.
   </Step>
 
   <Step title="Watch it reconcile">
     Within seconds, the payment is matched and posted to the customer's balance. Confirm it:
 
     ```bash
-    curl https://api.meroe.dev/v1/customers/{id}/balance \
+    curl https://meroe.ddns.net/v1/customers/{id}/balance \
       -H "Authorization: Bearer mr_test_sk_..."
     ```
 
-    Behind the scenes, this posted a double-entry ledger transaction: a debit to `@external/NGN` and a credit to `@customer:{id}:NGN`. Read [Reconciliation](/docs/concepts/reconciliation) and [The Ledger](/docs/concepts/ledger) to understand what just happened.
+    The endpoint path `https://meroe.ddns.net/v1/customers/{id}/balance` returns the current balance. Read [Reconciliation](/docs/concepts/reconciliation) and [The Ledger](/docs/concepts/ledger) to understand the underlying mechanics.
   </Step>
 </Steps>
 

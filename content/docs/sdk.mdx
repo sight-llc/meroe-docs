@@ -17,11 +17,18 @@ npm install meroe-sdk
 import { Meroe } from 'meroe-sdk'
 
 const client = new Meroe({ apiKey: 'mr_test_sk_...' })
+```
 
+<Note>
+  The `apiKey` is the `rawKey` returned by `POST /v1/api-keys` — it's shown once at creation time.
+</Note>
+
+```typescript
 const customer = await client.customers.create({
   fullName: 'Aisha Mohammed',
   kycTier: 'TIER_1',
   bvn: '12345678901',
+  externalRef: 'your-system-customer-id',
 })
 
 console.log(customer.account.accountNumber) // 8012345678

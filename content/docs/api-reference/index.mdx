@@ -16,7 +16,7 @@ This section is **auto-generated** from the live OpenAPI spec. Don't hand-edit p
 
 Everything a developer building on Meroe needs to call:
 
-- **Developer Auth** — login and token refresh (`/v1/developers/auth/login`, `/v1/developers/auth/refresh`). Registration is not included — onboarding happens via `app.meroe.dev`, not the API.
+- **Developer Auth** — login and token refresh (`/v1/developers/auth/login`, `/v1/developers/auth/refresh`). Registration is not included — onboarding happens via `meroe-developer-dashboard.vercel.app`, not the API.
 - **Apps** — create and list app namespaces that scope customers and virtual accounts
 - **API Keys** — mint, list, and revoke scoped API keys programmatically
 - **Customers** — create customers, provision NUBANs, query balances and identity
@@ -30,7 +30,7 @@ Everything a developer building on Meroe needs to call:
 ## Base URL
 
 ```
-https://api.meroe.dev/v1
+https://meroe.ddns.net/v1
 ```
 
 ## Authentication
@@ -38,16 +38,9 @@ https://api.meroe.dev/v1
 All endpoints except login and refresh require a bearer token:
 
 ```bash
-curl https://api.meroe.dev/v1/customers \
+curl https://meroe.ddns.net/v1/customers \
   -H "Authorization: Bearer mr_test_sk_..."
 ```
 
 See [Authentication](/docs/guides/authentication) for key scopes, rotation, and sandbox vs live keys.
 
-## Regenerating this section
-
-```bash
-npm run gen-api
-```
-
-Fetches the spec from `OPENAPI_SPEC_URL`, regenerates all pages under `content/docs/api-reference/`, and writes `public/api-spec.json` which powers the in-page API playground.

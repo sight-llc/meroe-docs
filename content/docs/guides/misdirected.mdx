@@ -10,7 +10,7 @@ A misdirected payment is money that landed in a customer's NUBAN but failed one 
 No action is required to detect a misdirected payment — every inbound transfer runs through the same matching pipeline. When it fails, the payment is marked `UNMATCHED` and the funds are posted to `@suspense/NGN` rather than the customer's balance, so they're never silently credited to the wrong person.
 
 ```bash
-curl https://api.meroe.dev/v1/reconciliation/unmatched \
+curl https://meroe.ddns.net/v1/misdirected-payments \
   -H "Authorization: Bearer mr_test_sk_..."
 ```
 
@@ -28,7 +28,7 @@ Returns the queue of unmatched payments, each with a flag reason:
 Once a human (or your own automated rule) reviews the flagged payment, the typical resolution is a refund back to the sender:
 
 ```bash
-curl -X POST https://api.meroe.dev/v1/reconciliation/{id}/refund \
+curl -X POST https://meroe.ddns.net/v1/misdirected-payments/{id}/resolve \
   -H "Authorization: Bearer mr_test_sk_..."
 ```
 

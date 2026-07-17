@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: 'Meroe',
   description: 'Dedicated virtual account infrastructure on top of Nomba — identity, reconciliation, ledger, and lifecycle, in one API.',
-  url: 'https://docs-meroe.netlify.app',
+  url: 'https://meroe-docs.vercel.app',
 
   logo: {
     src: '/logo.svg',
@@ -11,7 +11,7 @@ export const siteConfig = {
   },
 
   links: {
-    github: 'https://github.com/sight-llc/meroe-sdk',
+    github: 'https://github.com/sight-llc/nombadva',
     discord: '',
     twitter: '',
     support: 'mailto:praiseubong@gmail.com',
@@ -21,8 +21,8 @@ export const siteConfig = {
     companyName: 'Meroe',
     links: [
       { label: 'API Status', href: 'https://meroe.ddns.net/swagger-ui/index.html' },
-      { label: 'Dashboard', href: 'https://app-meroe.netlify.app' },
-      { label: 'GitHub', href: 'https://github.com/sight-llc/meroe-sdk' },
+      { label: 'Dashboard', href: 'https://meroe-developer-dashboard.vercel.app/' },
+      { label: 'GitHub', href: 'https://github.com/sight-llc/nombadva' },
     ],
   },
 }

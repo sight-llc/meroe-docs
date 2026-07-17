@@ -8,7 +8,7 @@ A statement is a derived view over the [ledger](/docs/concepts/ledger) for a giv
 ## Querying as JSON
 
 ```bash
-curl "https://api.meroe.dev/v1/customers/{id}/statement?from=2026-01-01&to=2026-03-31" \
+curl "https://meroe.ddns.net/v1/customers/{id}/transactions?from=2026-01-01&to=2026-03-31" \
   -H "Authorization: Bearer mr_test_sk_..."
 ```
 
@@ -26,12 +26,12 @@ curl "https://api.meroe.dev/v1/customers/{id}/statement?from=2026-01-01&to=2026-
 
 ```bash
 # PDF
-curl "https://api.meroe.dev/v1/customers/{id}/statement/pdf?from=2026-01-01&to=2026-03-31" \
+curl "https://meroe.ddns.net/v1/customers/{id}/statements?from=2026-01-01&to=2026-03-31&format=pdf" \
   -H "Authorization: Bearer mr_test_sk_..." \
   -o statement.pdf
 
 # CSV
-curl "https://api.meroe.dev/v1/customers/{id}/statement/csv?from=2026-01-01&to=2026-03-31" \
+curl "https://meroe.ddns.net/v1/customers/{id}/statements?from=2026-01-01&to=2026-03-31&format=csv" \
   -H "Authorization: Bearer mr_test_sk_..." \
   -o statement.csv
 ```

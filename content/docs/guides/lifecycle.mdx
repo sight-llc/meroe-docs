@@ -16,7 +16,7 @@ A Meroe account moves through a small, explicit set of states — never an ambig
 ## Suspending an account
 
 ```bash
-curl -X POST https://api.meroe.dev/v1/accounts/{id}/suspend \
+curl -X PUT https://meroe.ddns.net/v1/customers/{id}/suspend \
   -H "Authorization: Bearer mr_test_sk_..."
 ```
 
@@ -27,7 +27,7 @@ A suspended account's NUBAN is still technically receivable from the bank's side
 Closure isn't instant. A grace period elapses first, during which the account remains visible (read-only) for any in-flight reconciliation or compliance review to complete:
 
 ```bash
-curl -X POST https://api.meroe.dev/v1/accounts/{id}/close \
+curl -X PUT https://meroe.ddns.net/v1/customers/{id}/close \
   -H "Authorization: Bearer mr_test_sk_..."
 ```
 
@@ -35,14 +35,13 @@ curl -X POST https://api.meroe.dev/v1/accounts/{id}/close \
 An account cannot be closed with a non-zero balance. Settle or withdraw the remaining balance first, or the close request will be rejected.
 </Warning>
 
-## Every transition is audited
+## Reactivating an account
 
-State changes are written to the `account_events` timeline alongside renames and KYC tier changes, queryable via:
+A suspended account can be reactivated by calling `PUT /v1/customers/{id}/reactivate`. Once reactivated, the account returns to `ACTIVE` state and inbound payments post to the customer's balance normally.
 
-```bash
-curl https://api.meroe.dev/v1/customers/{id}/events \
-  -H "Authorization: Bearer mr_test_sk_..."
-```
+## Changing KYC tier
+
+`PUT /v1/customers/{id}/kyc` updates the customer's tier. This immediately changes the balance monitor threshold on the account. See [KYC Tiers](/docs/concepts/kyc-tiers).
 
 <CardGroup cols={2}>
   <Card title="Virtual Accounts" href="/docs/concepts/virtual-accounts">

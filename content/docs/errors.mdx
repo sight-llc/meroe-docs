@@ -3,6 +3,8 @@ title: Errors
 description: Every Meroe error code, what it means, and how to fix it.
 ---
 
+All Meroe error responses follow RFC 7807 Problem Details. The response body always includes `type`, `title`, `status`, `detail`, and a `requestId` for support reference.
+
 All Meroe errors share a consistent shape, including a `requestId` you should log and reference when reaching out for support:
 
 ```json
@@ -36,7 +38,7 @@ All Meroe errors share a consistent shape, including a `requestId` you should lo
   The requested operation would breach the customer's KYC tier balance threshold. See [KYC tiers](/docs/concepts/kyc-tiers).
 </ResponseField>
 <ResponseField name="rate_limited" type="429">
-  Too many requests for this key in the current window. Check the `X-RateLimit-*` response headers for reset timing.
+  Too many requests for this key in the current window. Check `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` headers on every response — they're always present, so you can back off before hitting 429.
 </ResponseField>
 
 <Tip>

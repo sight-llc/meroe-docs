@@ -1,0 +1,80 @@
+---
+title: Transfers
+description: Payouts from customer wallets to external NUBANs, and VA-to-VA internal transfers.
+---
+
+A transfer is a payout from a customer wallet to an external NUBAN, or a VA-to-VA internal transfer. Transfers above the approval threshold require a second developer to approve before execution.
+
+## Bank lookup
+
+Always call `POST /v1/transfers/bank-lookup` first to verify the destination account before requesting a transfer. This confirms the account exists and returns the account name for verification.
+
+```bash
+curl -X POST https://meroe.ddns.net/v1/transfers/bank-lookup \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "bankCode": "058",
+    "accountNumber": "1234567890"
+  }'
+```
+
+## Requesting a payout
+
+Once you've verified the destination account, request the transfer:
+
+```bash
+curl -X POST https://meroe.ddns.net/v1/transfers \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "cus_123",
+    "bankCode": "058",
+    "accountNumber": "1234567890",
+    "accountName": "John Doe",
+    "amount": 50000,
+    "narration": "Payout for invoice #1234"
+  }'
+```
+
+The response includes a transfer ID and status. Transfers below the approval threshold execute immediately; transfers above the threshold land in `PENDING_APPROVAL` status.
+
+## Maker-checker flow
+
+Transfers above the approval threshold require a second developer to approve. The requester and approver must be different developers.
+
+```bash
+curl -X POST https://meroe.ddns.net/v1/transfers/{id}/approve \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transactionPin": "1234"
+  }'
+```
+
+## Transaction PIN
+
+Before a developer can approve transfers, they must set a transaction PIN. This can be done via the dashboard or programmatically:
+
+```bash
+curl -X POST https://meroe.ddns.net/v1/developers/me/transaction-pin \
+  -H "Authorization: Bearer mr_test_sk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pin": "1234",
+    "confirmPin": "1234"
+  }'
+```
+
+## Settlement webhooks
+
+Transfer outcome is delivered as `TRANSFER.SETTLED` or `TRANSFER.FAILED` via webhook. See [Webhooks](/docs/concepts/webhooks) for how to receive and verify these events.
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" href="/docs/concepts/webhooks">
+    Receiving transfer outcome events.
+  </Card>
+  <Card title="Authentication" href="/docs/guides/authentication">
+    API keys and scopes for transfer operations.
+  </Card>
+</CardGroup>

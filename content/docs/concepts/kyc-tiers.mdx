@@ -24,7 +24,7 @@ A balance monitor watches a customer's account and evaluates incoming payments a
 ## Upgrading a tier
 
 ```bash
-curl -X PATCH https://api.meroe.dev/v1/customers/{id}/kyc-tier \
+curl -X PUT https://meroe.ddns.net/v1/customers/{id}/kyc \
   -H "Authorization: Bearer mr_test_sk_..." \
   -H "Content-Type: application/json" \
   -d '{"kycTier": "TIER_2"}'

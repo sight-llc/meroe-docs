@@ -15,7 +15,7 @@ Once a payment is reconciled (or fails to reconcile, or a customer's KYC tier li
 
 ```json
 {
-  "event": "payment.matched",
+  "event": "PAYMENT.RECEIVED",
   "data": {
     "customerId": "cus_123",
     "amount": 500000,
@@ -26,31 +26,9 @@ Once a payment is reconciled (or fails to reconcile, or a customer's KYC tier li
 }
 ```
 
-### Verifying the signature
+### Inbound webhook verification
 
-Every outbound webhook is signed with HMAC so you can confirm it actually came from Meroe and wasn't forged or replayed:
-
-<CodeGroup>
-```typescript title="Node.js"
-import crypto from 'crypto'
-
-function verifyWebhook(payload: string, signature: string, secret: string) {
-  const expected = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex')
-
-  return crypto.timingSafeEqual(
-    Buffer.from(expected),
-    Buffer.from(signature)
-  )
-}
-```
-</CodeGroup>
-
-<Warning>
-Always compare signatures with a constant-time comparison (like `timingSafeEqual`), not `===`, to avoid timing attacks.
-</Warning>
+Meroe handles Nomba's inbound webhook verification internally using a 9-field canonical format, `nomba-signature` and `nomba-timestamp` headers, and a ±5-minute replay window. API consumers do not need to implement this — see `POST /v1/webhooks/nomba` in the [API Reference](/docs/api-reference) for configuration.
 
 ## Delivery guarantees
 
@@ -60,11 +38,10 @@ Webhooks are delivered using an outbox pattern — the event is durably recorded
 
 | Event | Fired when |
 |---|---|
-| `payment.matched` | An inbound payment is successfully reconciled |
-| `payment.unmatched` | A payment fails reconciliation and is flagged |
-| `kyc.limit_breach` | A payment would exceed the customer's KYC tier balance threshold |
-| `account.suspended` | An account transitions to `SUSPENDED` |
-| `refund.completed` | A misdirected payment refund is processed |
+| `PAYMENT.RECEIVED` | An inbound payment is successfully reconciled |
+| `TRANSFER.SETTLED` | A transfer completes successfully |
+| `TRANSFER.FAILED` | A transfer fails |
+| `CUSTOMER.CLOSED` | An account transitions to `CLOSED` |
 
 <CardGroup cols={2}>
   <Card title="Authentication" href="/docs/guides/authentication">
